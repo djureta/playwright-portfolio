@@ -58,7 +58,3 @@ test("delete room", async ({ page }) => {
 
   await expect(page.getByText("104")).not.toBeVisible();
 });
-
-test.afterAll(async () => {
-  await db.end();
-});
