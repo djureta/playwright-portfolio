@@ -81,10 +81,6 @@ test("POST create booking and verify in DB", async ({ request }) => {
   });
 });
 
-test.afterAll(async () => {
-  await db.end();
-});
-
 test.afterEach(async ({ request }) => {
   const loginResponse = await request.post("/api/auth/login", {
     data: { username: "admin", password: "password" },
