@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS rooms (
     features TEXT[]
 );
 
+INSERT INTO rooms (room_number, room_type, price, accessible) 
+VALUES ('101', 'Single', 100, true);
+
 CREATE TABLE IF NOT EXISTS bookings (
     booking_id SERIAL PRIMARY KEY,
     room_id INTEGER REFERENCES rooms(room_id),
