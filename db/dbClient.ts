@@ -22,5 +22,9 @@ pool
 
 export const db = {
   query: (text: string, params?: unknown[]) => pool.query(text, params),
-  end: () => pool.end(),
+  end: async () => {
+    try {
+      await pool.end();
+    } catch (e) {}
+  },
 };
