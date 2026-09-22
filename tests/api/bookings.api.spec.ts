@@ -1,12 +1,20 @@
 import { test, expect } from "@playwright/test";
 import { db } from "../../db/dbClient";
 
-test("GET bookings for room", async ({ request }) => {
-  const loginResponse = await request.post("/api/auth/login", {
-    data: { username: "admin", password: "password" },
-  });
-  const { token } = await loginResponse.json();
+let token: string;
 
+test.beforeEach(async ({ request }) => {
+  const loginResponse = await request.post("/api/auth/login", {
+    data: {
+      username: process.env.ADMIN_USERNAME,
+      password: process.env.ADMIN_PASSWORD,
+    },
+  });
+  const body = await loginResponse.json();
+  token = body.token;
+});
+
+test("GET bookings for room", async ({ request }) => {
   const response = await request.get("/api/booking?roomid=1", {
     headers: { Cookie: `token=${token}` },
   });
@@ -17,11 +25,6 @@ test("GET bookings for room", async ({ request }) => {
 });
 
 test("POST create booking and verify in DB", async ({ request }) => {
-  const loginResponse = await request.post("/api/auth/login", {
-    data: { username: "admin", password: "password" },
-  });
-  const { token } = await loginResponse.json();
-
   const checkin = new Date();
   checkin.setDate(checkin.getDate() + 30);
   const checkout = new Date();
@@ -83,7 +86,10 @@ test("POST create booking and verify in DB", async ({ request }) => {
 
 test.afterEach(async ({ request }) => {
   const loginResponse = await request.post("/api/auth/login", {
-    data: { username: "admin", password: "password" },
+    data: {
+      username: process.env.ADMIN_USERNAME,
+      password: process.env.ADMIN_PASSWORD,
+    },
   });
   const { token } = await loginResponse.json();
 

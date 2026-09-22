@@ -3,23 +3,25 @@ import { db } from "../../db/dbClient";
 import { LoginPage } from "../../pages/LoginPage";
 import { RoomsPage } from "../../pages/RoomsPage";
 
-test("rooms table is visible", async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  const roomsPage = new RoomsPage(page);
+let loginPage: LoginPage;
+let roomsPage: RoomsPage;
 
+test.beforeEach(async ({ page }) => {
+  loginPage = new LoginPage(page);
+  roomsPage = new RoomsPage(page);
   await loginPage.navigateTo("/admin");
-  await loginPage.login("admin", "password");
+  await loginPage.login(
+    process.env.ADMIN_USERNAME!,
+    process.env.ADMIN_PASSWORD!
+  );
+  await page.waitForURL("**/admin/rooms");
+});
 
+test("rooms table is visible", async ({ page }) => {
   await roomsPage.tableIsVisible();
 });
 
 test("create room", async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  const roomsPage = new RoomsPage(page);
-
-  await loginPage.navigateTo("/admin");
-  await loginPage.login("admin", "password");
-
   await roomsPage.createRoom({
     roomNumber: "104",
     type: "Single",
@@ -48,12 +50,6 @@ test("create room", async ({ page }) => {
 });
 
 test("delete room", async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  const roomsPage = new RoomsPage(page);
-
-  await loginPage.navigateTo("/admin");
-  await loginPage.login("admin", "password");
-
   await roomsPage.deleteRoom("104");
 
   await expect(page.getByText("104")).not.toBeVisible();

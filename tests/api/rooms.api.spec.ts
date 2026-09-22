@@ -1,5 +1,18 @@
 import { test, expect } from "@playwright/test";
 
+let token: string;
+
+test.beforeEach(async ({ request }) => {
+  const loginResponse = await request.post("/api/auth/login", {
+    data: {
+      username: process.env.ADMIN_USERNAME,
+      password: process.env.ADMIN_PASSWORD,
+    },
+  });
+  const body = await loginResponse.json();
+  token = body.token;
+});
+
 test("GET all rooms", async ({ request }) => {
   const response = await request.get("/api/room");
 
@@ -9,30 +22,7 @@ test("GET all rooms", async ({ request }) => {
   expect(body.rooms.length).toBeGreaterThan(0);
 });
 
-test("get auth token", async ({ request }) => {
-  const response = await request.post("/api/auth/login", {
-    data: {
-      username: "admin",
-      password: "password",
-    },
-  });
-
-  console.log("Status:", response.status());
-  console.log("Body:", await response.text());
-  console.log("Headers:", response.headers());
-});
-
 test("POST add room", async ({ request }) => {
-  const loginResponse = await request.post("/api/auth/login", {
-    data: {
-      username: "admin",
-      password: "password",
-    },
-  });
-
-  const body = await loginResponse.json();
-  const token = body.token;
-
   const createRoomResponse = await request.post("/api/room", {
     data: {
       roomName: "111",
@@ -53,16 +43,6 @@ test("POST add room", async ({ request }) => {
 });
 
 test("PUT update room", async ({ request }) => {
-  const loginResponse = await request.post("/api/auth/login", {
-    data: {
-      username: "admin",
-      password: "password",
-    },
-  });
-
-  const loginBody = await loginResponse.json();
-  const token = loginBody.token;
-
   const getRoomsResponse = await request.get("/api/room");
   const roomsBody = await getRoomsResponse.json();
   const roomId = roomsBody.rooms[0].roomid;
@@ -84,16 +64,6 @@ test("PUT update room", async ({ request }) => {
 });
 
 test("DELETE room by ID", async ({ request }) => {
-  const loginResponse = await request.post("/api/auth/login", {
-    data: {
-      username: "admin",
-      password: "password",
-    },
-  });
-
-  const loginBody = await loginResponse.json();
-  const token = loginBody.token;
-
   const getAllRooms = await request.get("/api/room");
   const roomsBody = await getAllRooms.json();
   const roomId = roomsBody.rooms[0].roomid;

@@ -34,7 +34,10 @@ test("check successful reservation of the room", async ({ page }) => {
 
 test.afterEach(async ({ request }) => {
   const loginResponse = await request.post("/api/auth/login", {
-    data: { username: "admin", password: "password" },
+    data: {
+      username: process.env.ADMIN_USERNAME,
+      password: process.env.ADMIN_PASSWORD,
+    },
   });
   const { token } = await loginResponse.json();
 
